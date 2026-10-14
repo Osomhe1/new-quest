@@ -1,0 +1,13 @@
+Candidate ID,Name,Email,Role,Department,Stage,Last Activity,Hiring Manager,Recruiter,Next Step Owner,Notes,Tags
+CAND-101,Elena Rostova,elena.r@example.com,Staff Backend Engineer,Core Platform,Offer Extended,2026-03-21,Marcus Vance,Jessica Alba,Recruiter,Candidate reviewing offer letter. Competing offer from Stripe expires Friday.,urgent;competing_offer
+CAND-102,David Chen,dchen@example.com,Senior Frontend Engineer,Design Systems,Debrief,2026-03-19,Sarah Jenkins,Jessica Alba,Hiring Manager,Loop completed Thursday. Waiting on Dan and Priya to submit final scorecards.,scorecard_pending
+CAND-103,Amina Yusuf,amina.y@example.com,Product Manager,Growth,Technical Interview,2026-03-18,Rachel Green,David Ortiz,Hiring Manager,Product sense interview took place 5 days ago. No feedback logged yet.,high_priority
+CAND-104,Liam Gallagher,liam.g@example.com,DevOps / SRE Lead,Infrastructure,Onsite / Final,2026-03-16,Marcus Vance,David Ortiz,Recruiter,Completed 4 interview sessions. HM Marcus traveling this week.,travel_blocker
+CAND-105,Priya Patel,priya.p@example.com,Engineering Manager,Data Platform,Take-Home,2026-03-15,Sarah Jenkins,Jessica Alba,Hiring Manager,Architecture assignment submitted by candidate on March 15. Awaiting review.,
+CAND-106,Lucas Meyer,lucas.m@example.com,Senior Data Scientist,Analytics,Screening,2026-03-17,Rachel Green,Jessica Alba,Recruiter,Recruiter screen completed. Candidate is open to hybrid. Need HM review to schedule tech screen.,referral;executive_referral
+CAND-107,Sofia Rossi,sofia.r@example.com,Security Engineer,Security,Applied,2026-03-23,Marcus Vance,David Ortiz,Recruiter,Strong resume with cloud infra certs. Application unreviewed.,
+CAND-108,Marcus Thorne,marcus.t@example.com,Backend Engineer,Core Platform,Offer Discussion,2026-03-22,Marcus Vance,Jessica Alba,Recruiter,Discussed base salary. Candidate requested +$10k or additional equity grant. Pending comp committee approval.,comp_negotiation
+CAND-109,Hana Takahashi,hana.t@example.com,Mobile Engineer (iOS),Mobile,Technical Interview,2026-03-24,Sarah Jenkins,David Ortiz,Hiring Manager,iOS live coding session completed yesterday. Normal turnaround.,
+CAND-110,Tariq Mansoor,tariq.m@example.com,Fullstack Engineer,Growth,Screening,2026-03-12,Rachel Green,David Ortiz,Candidate,Left voicemail and sent 2 emails for initial screen. No response.,unresponsive
+CAND-111,Chloe Bennett,chloe.b@example.com,UX Researcher,Design,Archived,2026-03-10,Rachel Green,Jessica Alba,None,Candidate withdrew due to accepted offer elsewhere.,withdrawn
+CAND-112,Julian Alvarez,julian.a@example.com,QA Automation Lead,Quality,Rejected,2026-03-11,Sarah Jenkins,David Ortiz,None,Did not meet bar on automated test architecture.,rejected

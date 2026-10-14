@@ -1,0 +1,43 @@
+{
+  "name": "stall-alerter",
+  "version": "1.0.0",
+  "description": "AI-First Hiring Board Stall Alerter - Detects pipeline stalls, prioritizes follow-ups, and drafts immediate actions",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "stall-alert": "dist/cli/index.js"
+  },
+  "scripts": {
+    "start": "tsx src/cli/index.ts",
+    "cli": "tsx src/cli/index.ts",
+    "web": "tsx src/web/server.ts",
+    "stress-test": "tsx src/cli/index.ts stress-test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "generate-csv": "tsx src/scripts/generateCsv.ts",
+    "build": "tsc"
+  },
+  "keywords": [
+    "hiring",
+    "recruitment",
+    "stall-detector",
+    "ai-first",
+    "gemini"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^2.29.0",
+    "commander": "^14.0.3",
+    "csv-parse": "^7.0.3",
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

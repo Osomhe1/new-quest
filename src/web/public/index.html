@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stall Alerter — AI-First Hiring Board Triage</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-badge">⚡ AI-First</div>
+        <h1>Hiring Board Stall Alerter</h1>
+        <p class="subtitle">Autonomous SLA breach detection, bottleneck triage, and instant action drafting</p>
+      </div>
+      <div class="header-actions">
+        <div class="sample-btn-group">
+          <span class="sample-label">Load Dataset:</span>
+          <button class="btn btn-secondary active" onclick="loadSample('clean_board')">Clean Baseline</button>
+          <button class="btn btn-secondary" onclick="loadSample('messy_board')">Messy Real-World</button>
+          <button class="btn btn-secondary" onclick="loadSample('adversarial_board')">High-Load Adversarial</button>
+        </div>
+        <label class="btn btn-primary file-upload-btn">
+          <span>📁 Upload CSV</span>
+          <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileUpload(event)">
+        </label>
+      </div>
+    </header>
+
+    <!-- Metrics Cards -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-title">Active Candidates</span>
+        <span class="metric-value" id="valTotalActive">-</span>
+        <span class="metric-sub" id="subArchived">- archived/closed</span>
+      </div>
+      <div class="metric-card alert-stalled">
+        <span class="metric-title">Stalled Pipelines</span>
+        <span class="metric-value" id="valTotalStalled">-</span>
+        <span class="metric-sub" id="subStallPct">- of active pool</span>
+      </div>
+      <div class="metric-card alert-critical">
+        <span class="metric-title">Critical Breaches</span>
+        <span class="metric-value" id="valCritical">-</span>
+        <span class="metric-sub">Immediate action required</span>
+      </div>
+      <div class="metric-card alert-high">
+        <span class="metric-title">High Urgency</span>
+        <span class="metric-value" id="valHigh">-</span>
+        <span class="metric-sub">Approaching flight risk</span>
+      </div>
+      <div class="metric-card alert-ontrack">
+        <span class="metric-title">On-Track Pipelines</span>
+        <span class="metric-value" id="valOnTrack" style="color: #34d399;">-</span>
+        <span class="metric-sub">Within SLA guidelines</span>
+      </div>
+      <div class="metric-card alert-warnings">
+        <span class="metric-title">Ingestion Warnings</span>
+        <span class="metric-value" id="valWarnings">0</span>
+        <span class="metric-sub">Resiliently auto-repaired</span>
+      </div>
+    </section>
+
+    <!-- Controls & Filters -->
+    <section class="controls-panel">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by candidate name, role, or owner..." oninput="filterBoard()">
+      </div>
+      <div class="filter-group">
+        <label>View:
+          <select id="statusFilter" onchange="filterBoard()">
+            <option value="all" selected>All Candidates (Mixed)</option>
+            <option value="stalled">Stalled Only</option>
+            <option value="ontrack">On Track Only</option>
+          </select>
+        </label>
+        <label>Ref Date:
+          <input type="date" id="refDateInput" value="2026-03-25" onchange="reanalyzeCurrentData()">
+        </label>
+        <label>Stage:
+          <select id="stageFilter" onchange="filterBoard()">
+            <option value="">All Stages</option>
+            <option value="Offer Extended">Offer Extended</option>
+            <option value="Offer Discussion">Offer Discussion</option>
+            <option value="Debrief">Debrief</option>
+            <option value="Onsite / Final">Onsite / Final</option>
+            <option value="Technical Interview">Technical Interview</option>
+            <option value="Take-Home">Take-Home</option>
+            <option value="Screening">Screening</option>
+            <option value="Applied">Applied</option>
+          </select>
+        </label>
+        <label>Urgency:
+          <select id="urgencyFilter" onchange="filterBoard()">
+            <option value="">All Urgency</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+            <option value="ON TRACK">On Track</option>
+          </select>
+        </label>
+        <label>SLA Override:
+          <select id="slaOverride" onchange="reanalyzeCurrentData()">
+            <option value="">Stage-Specific (Recommended)</option>
+            <option value="2">Strict (2 Days)</option>
+            <option value="3">Standard (3 Days)</option>
+            <option value="5">Relaxed (5 Days)</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- Warnings Banner -->
+    <div id="warningsAccordion" class="warnings-box" style="display: none;">
+      <div class="warnings-header" onclick="toggleWarnings()">
+        <span>⚠️ Data Hygiene Anomalies Detected & Auto-Repaired (<span id="warnCount">0</span>)</span>
+        <span id="warnToggleText">▼ Show Details</span>
+      </div>
+      <div id="warningsList" class="warnings-list" style="display: none;"></div>
+    </div>
+
+    <!-- Triage Table -->
+    <main class="table-container">
+      <div class="table-header-info">
+        <h2>Prioritized Follow-Up Queue</h2>
+        <span id="showingCount" class="showing-count">Showing 0 candidates</span>
+      </div>
+      <table class="triage-table">
+        <thead>
+          <tr>
+            <th style="width: 50px;">Rank</th>
+            <th style="width: 100px;">Urgency</th>
+            <th>Candidate</th>
+            <th>Role & Department</th>
+            <th>Current Stage</th>
+            <th>Stalled Time</th>
+            <th>Action Owner</th>
+            <th>Prescribed Action</th>
+            <th style="width: 110px;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="triageTableBody">
+          <tr>
+            <td colspan="9" class="loading-cell">Loading dataset and analyzing pipeline...</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+    <!-- Modal for Detailed Dossier and Draft Communication -->
+    <div id="actionModal" class="modal-backdrop" style="display: none;" onclick="closeModalOnBackdrop(event)">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <span class="modal-badge" id="modalUrgencyBadge">CRITICAL</span>
+            <h3 id="modalCandidateName">Candidate Name</h3>
+            <p id="modalSubInfo" class="modal-sub">Senior Software Engineer • Engineering</p>
+          </div>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="dossier-section">
+            <h4>Pipeline Diagnostics</h4>
+            <div class="dossier-grid">
+              <div><strong>Current Stage:</strong> <span id="modalStage">-</span></div>
+              <div><strong>Last Activity:</strong> <span id="modalLastActivity">-</span></div>
+              <div><strong>Days Stalled:</strong> <span id="modalDaysStalled">-</span></div>
+              <div><strong>Stage SLA:</strong> <span id="modalSLA">-</span></div>
+              <div><strong>Next Step Owner:</strong> <span id="modalOwner">-</span></div>
+              <div><strong>Recruiter:</strong> <span id="modalRecruiter">-</span></div>
+            </div>
+          </div>
+
+          <div class="dossier-section" id="modalRisksContainer">
+            <h4>Identified Risk Signals</h4>
+            <div id="modalRisksList" class="risk-pills"></div>
+          </div>
+
+          <div class="dossier-section">
+            <h4>Candidate History / Recruiter Notes</h4>
+            <div id="modalNotes" class="notes-quote"></div>
+          </div>
+
+          <div class="dossier-section action-box">
+            <div class="action-box-header">
+              <h4>🎯 Prescribed Next Action</h4>
+              <span id="modalChannelBadge" class="channel-badge">Email</span>
+            </div>
+            <p id="modalActionSummary" class="action-summary-text"></p>
+            <p id="modalRankReason" class="rank-reason-text"></p>
+
+            <div class="draft-container">
+              <div class="draft-header">
+                <strong>Subject: <span id="modalSubject"></span></strong>
+                <button class="btn btn-copy" onclick="copyDraftMessage()">📋 Copy Draft</button>
+              </div>
+              <textarea id="modalDraftMessage" readonly rows="8" class="draft-textarea"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
